@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "mqtt": "^5.10.3",
     "sparkplug-payload": "^1.0.3"
   }

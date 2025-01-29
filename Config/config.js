@@ -1,18 +1,26 @@
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 async function readConfig() {
-    const configFilePath = path.join(__dirname, '..', 'config.txt');
+    const envFilePath = path.join(__dirname, '..', '.env');
+    if (!fs.existsSync(envFilePath)) {
+        await generateDefaultConfig();
+        require('dotenv').config({ path: envFilePath });
+    }
+
     try {
-        const data = fs.readFileSync(configFilePath, 'utf-8');
-        const config = {};
-        data.split('\n').forEach(line => {
-            const [key, value] = line.split('=');
-            if (key && value) {
-                const configKey = key.trim();
-                config[configKey] = value.trim();
-            }
-        });
+        const config = {
+            mqttBrokerUrl: process.env.MQTT_BROKER_URL,
+            mqttUsername: process.env.MQTT_USERNAME,
+            mqttPassword: process.env.MQTT_PASSWORD,
+            clientCertificate: process.env.CLIENT_CERTIFICATE,
+            clientKey: process.env.CLIENT_KEY,
+            caCertificate: process.env.CA_CERTIFICATE,
+            groupId: process.env.GROUP_ID,
+            edgeNodeId: process.env.EDGE_NODE_ID,
+            deviceId: process.env.DEVICE_ID
+        };
         return config;
     } catch (err) {
         logError(err);
@@ -31,20 +39,20 @@ async function writeConfig(
     edgeNodeId,
     deviceId
 ) {
-    const configFilePath = path.join(__dirname, '..', 'config.txt');
+    const envFilePath = path.join(__dirname, '..', '.env');
     const configContent = 
-`mqttBrokerUrl=${mqttBrokerUrl}
-groupId=${groupId}
-edgeNodeId=${edgeNodeId}
-deviceId=${deviceId}
-mqttUsername=${mqttUsername}
-mqttPassword=${mqttPassword}
-clientCertificate=${clientCertificate}
-clientKey=${clientKey}
-caCertificate=${caCertificate}`;
+`MQTT_BROKER_URL=${mqttBrokerUrl}
+GROUP_ID=${groupId}
+EDGE_NODE_ID=${edgeNodeId}
+DEVICE_ID=${deviceId}
+MQTT_USERNAME=${mqttUsername}
+MQTT_PASSWORD=${mqttPassword}
+CLIENT_CERTIFICATE=${clientCertificate}
+CLIENT_KEY=${clientKey}
+CA_CERTIFICATE=${caCertificate}`;
 
     try {
-        fs.writeFileSync(configFilePath, configContent, 'utf-8');
+        fs.writeFileSync(envFilePath, configContent, 'utf-8');
     } catch (err) {
         logError(err);
         throw err;
@@ -52,20 +60,20 @@ caCertificate=${caCertificate}`;
 }
 
 async function generateDefaultConfig() {
-    const configFilePath = path.join(__dirname, '..', 'config.txt');
+    const envFilePath = path.join(__dirname, '..', '.env');
     const defaultConfig = 
-`mqttBrokerUrl=mqtt://localhost:1883
-groupId=defaultGroup
-edgeNodeId=defaultEdgeNode
-deviceId=defaultDevice
-mqttUsername=
-mqttPassword=
-clientCertificate=
-clientKey=
-caCertificate=`;
+`MQTT_BROKER_URL=mqtt://localhost:1883
+GROUP_ID=defaultGroup
+EDGE_NODE_ID=defaultEdgeNode
+DEVICE_ID=defaultDevice
+MQTT_USERNAME=
+MQTT_PASSWORD=
+CLIENT_CERTIFICATE=
+CLIENT_KEY=
+CA_CERTIFICATE=`;
 
     try {
-        fs.writeFileSync(configFilePath, defaultConfig, 'utf-8');
+        fs.writeFileSync(envFilePath, defaultConfig, 'utf-8');
     } catch (err) {
         logError(err);
         throw err;
@@ -73,8 +81,8 @@ caCertificate=`;
 }
 
 function configExists() {
-    const configFilePath = path.join(__dirname, '..', 'config.txt');
-    return fs.existsSync(configFilePath);
+    const envFilePath = path.join(__dirname, '..', '.env');
+    return fs.existsSync(envFilePath);
 }
 
 function logError(error) {

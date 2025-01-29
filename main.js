@@ -1,13 +1,10 @@
-const { generateDefaultConfig, readConfig, writeConfig, configExists } = require('./Config/config');
+const { readConfig } = require('./Config/config');
 const { publishMessage } = require('./SparkplugB/publisher');
 var sparkplug = require('sparkplug-payload').get("spBv1.0");
 
 async function main() {
-    if (!configExists())
-        await generateDefaultConfig();
+    console.log("Reading configuration...");
     let config = await readConfig();
-
-    console.log(config);
 
     var payload = {
         "timestamp": new Date().getTime(),
@@ -23,7 +20,9 @@ async function main() {
     var encoded = sparkplug.encodePayload(payload);
 
     const topic = `spBv1.0/${config.groupId}/${config.edgeNodeId}/${config.deviceId}/DDATA`;
-    publishMessage(topic, encoded);
+    console.log("Publishing message to topic:", topic);
+    await publishMessage(topic, encoded);
+    console.log("Message published");
 }
 
 main().catch(err => console.error(err));
