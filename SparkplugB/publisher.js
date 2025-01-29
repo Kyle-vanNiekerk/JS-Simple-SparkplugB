@@ -21,7 +21,7 @@ async function readConfig() {
     }
 }
 
-function publishMessage(message) {
+function publishMessage(topic, message) {
     readConfig().then(config => {
         const options = {
             username: config.mqttUsername || undefined,
@@ -34,7 +34,7 @@ function publishMessage(message) {
         const client = mqtt.connect(config.mqttBrokerUrl, options);
 
         client.on('connect', () => {
-            client.publish(config.mqttTopic, message, {}, (err) => {
+            client.publish(topic, message, {}, (err) => {
                 if (err) {
                     logError(err);
                 }

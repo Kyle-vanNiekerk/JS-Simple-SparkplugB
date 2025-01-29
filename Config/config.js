@@ -22,17 +22,21 @@ async function readConfig() {
 
 async function writeConfig(
     mqttBrokerUrl,
-    mqttTopic,
     mqttUsername,
     mqttPassword,
     clientCertificate,
     clientKey,
-    caCertificate
+    caCertificate,
+    groupId,
+    edgeNodeId,
+    deviceId
 ) {
     const configFilePath = path.join(__dirname, '..', 'config.txt');
     const configContent = 
 `mqttBrokerUrl=${mqttBrokerUrl}
-mqttTopic=${mqttTopic}
+groupId=${groupId}
+edgeNodeId=${edgeNodeId}
+deviceId=${deviceId}
 mqttUsername=${mqttUsername}
 mqttPassword=${mqttPassword}
 clientCertificate=${clientCertificate}
@@ -51,7 +55,14 @@ async function generateDefaultConfig() {
     const configFilePath = path.join(__dirname, '..', 'config.txt');
     const defaultConfig = 
 `mqttBrokerUrl=mqtt://localhost:1883
-mqttTopic=opc_dev`;
+groupId=defaultGroup
+edgeNodeId=defaultEdgeNode
+deviceId=defaultDevice
+mqttUsername=
+mqttPassword=
+clientCertificate=
+clientKey=
+caCertificate=`;
 
     try {
         fs.writeFileSync(configFilePath, defaultConfig, 'utf-8');
